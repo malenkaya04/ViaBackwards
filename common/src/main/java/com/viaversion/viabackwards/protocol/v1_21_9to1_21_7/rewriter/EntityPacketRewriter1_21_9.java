@@ -201,14 +201,6 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
         playerInfo.write(Types.VAR_INT, 1);
         playerInfo.write(Types.UUID, uuid);
         playerInfo.write(Types.STRING, name != null ? name : randomHackyEmptyName());
-        List<GameProfile.Property> list = new ArrayList<>(List.of(properties));
-        if (list.isEmpty()) {
-            System.out.println("No properties for " + uuid + " " + name);
-        } else {
-            for (final GameProfile.Property property : list) {
-                System.out.println("Name: " + property.name() + " | value: " + property.value());
-            }
-        }
         playerInfo.write(Types.PROFILE_PROPERTY_ARRAY, properties);
         playerInfo.send(Protocol1_21_9To1_21_7.class);
     }
