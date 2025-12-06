@@ -194,7 +194,7 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
     private void sendPlayerInfoProfileUpdate(final UserConnection connection, final UUID uuid, @Nullable final String name, final GameProfile.Property[] properties) {
         final PacketWrapper playerInfo = PacketWrapper.create(ClientboundPackets1_21_6.PLAYER_INFO_UPDATE, connection);
         final BitSet actions = new BitSet(8);
-        actions.set(0);
+        actions.set(0x01);
         playerInfo.write(Types.PROFILE_ACTIONS_ENUM1_21_4, actions);
         playerInfo.write(Types.VAR_INT, 1);
         playerInfo.write(Types.UUID, uuid);
