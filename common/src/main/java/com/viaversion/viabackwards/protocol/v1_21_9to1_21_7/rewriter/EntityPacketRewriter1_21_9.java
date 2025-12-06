@@ -216,9 +216,6 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
         add.write(Types.DOUBLE, mannequinData.x());
         add.write(Types.DOUBLE, mannequinData.y());
         add.write(Types.DOUBLE, mannequinData.z());
-        add.write(Types.BYTE, (byte) 0);
-        add.write(Types.BYTE, (byte) 0);
-        add.write(Types.BYTE, (byte) 0);
         writeMovementShorts(add, Vector3d.ZERO);
         add.send(Protocol1_21_9To1_21_7.class);
     }
