@@ -193,7 +193,12 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
         addTeam.send(Protocol1_21_9To1_21_7.class);
     }
 
-    private void sendPlayerInfoProfileUpdate(final UserConnection connection, final UUID uuid, @Nullable final String name, final GameProfile.Property[] properties) {
+    private void sendPlayerInfoProfileUpdate(final UserConnection connection, final UUID uuid, @Nullable final String name, final GameProfile.Property[] properties, int entityId) {
+        PacketWrapper destroy = PacketWrapper.create(ClientboundPackets1_21_6.REMOVE_ENTITIES, connection);
+        destroy.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
+        destroy.send(Protocol1_21_9To1_21_7.class);
+
+
         final PacketWrapper playerInfo = PacketWrapper.create(ClientboundPackets1_21_6.PLAYER_INFO_UPDATE, connection);
         final BitSet actions = new BitSet(8);
         actions.set(0);
@@ -293,7 +298,7 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
             } else if (event.index() == 17) { // Profile
                 final ResolvableProfile profile = data.value();
                 final UUID uuid = event.trackedEntity().data().get(MannequinData.class).uuid();
-                sendPlayerInfoProfileUpdate(event.user(), uuid, profile.profile().name(), profile.profile().properties());
+                sendPlayerInfoProfileUpdate(event.user(), uuid, profile.profile().name(), profile.profile().properties(), event.entityId());
                 event.cancel();
             } else if (event.index() == 15) {
                 event.setIndex(18);
