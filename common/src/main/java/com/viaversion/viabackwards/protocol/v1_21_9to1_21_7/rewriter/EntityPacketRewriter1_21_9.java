@@ -43,7 +43,9 @@ import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPac
 import com.viaversion.viaversion.protocols.v1_21_7to1_21_9.packet.ClientboundPackets1_21_9;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandler;
 import com.viaversion.viaversion.util.ChatColorUtil;
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -199,6 +201,14 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
         playerInfo.write(Types.VAR_INT, 1);
         playerInfo.write(Types.UUID, uuid);
         playerInfo.write(Types.STRING, name != null ? name : randomHackyEmptyName());
+        List<GameProfile.Property> list = new ArrayList<>(List.of(properties));
+        if (list.isEmpty()) {
+            System.out.println("No properties for " + uuid + " " + name);
+        } else {
+            for (final GameProfile.Property property : list) {
+                System.out.println("Name: " + property.name() + " | value: " + property.value());
+            }
+        }
         playerInfo.write(Types.PROFILE_PROPERTY_ARRAY, properties);
         playerInfo.send(Protocol1_21_9To1_21_7.class);
     }
