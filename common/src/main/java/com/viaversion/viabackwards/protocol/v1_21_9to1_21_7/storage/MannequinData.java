@@ -23,10 +23,16 @@ public final class MannequinData {
     private final UUID uuid;
     private final String name;
     private boolean hasTeam;
+    private double x;
+    private double y;
+    private double z;
 
-    public MannequinData(final UUID uuid, final String name) {
+    public MannequinData(final UUID uuid, final String name, final double x, final double y, final double z) {
         this.uuid = uuid;
         this.name = name;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     public void setHasTeam(final boolean hasTeam) {
@@ -43,5 +49,17 @@ public final class MannequinData {
 
     public String name() {
         return name;
+    }
+
+    public double x() {
+        return x;
+    }
+
+    public double y() {
+        return y;
+    }
+
+    public double z() {
+        return z;
     }
 }

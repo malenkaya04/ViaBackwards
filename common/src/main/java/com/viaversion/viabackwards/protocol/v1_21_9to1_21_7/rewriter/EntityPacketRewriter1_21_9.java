@@ -70,9 +70,9 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
             final UUID uuid = wrapper.passthrough(Types.UUID);
             final int entityTypeId = wrapper.passthrough(Types.VAR_INT);
 
-            wrapper.passthrough(Types.DOUBLE); // X
-            wrapper.passthrough(Types.DOUBLE); // Y
-            wrapper.passthrough(Types.DOUBLE); // Z
+            double x = wrapper.passthrough(Types.DOUBLE); // X
+            double y = wrapper.passthrough(Types.DOUBLE); // Y
+            double z = wrapper.passthrough(Types.DOUBLE); // Z
 
             final Vector3d movement = wrapper.read(Types.MOVEMENT_VECTOR);
 
@@ -90,7 +90,7 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
 
             if (EntityTypes1_21_9.getTypeFromId(entityTypeId) == EntityTypes1_21_9.MANNEQUIN) {
                 final String name = randomHackyEmptyName();
-                final MannequinData mannequinData = new MannequinData(uuid, name);
+                final MannequinData mannequinData = new MannequinData(uuid, name, x,y,z);
                 tracker(wrapper.user()).entity(entityId).data().put(mannequinData);
                 sendInitialPlayerInfoUpdate(wrapper, mannequinData);
             }
@@ -193,7 +193,7 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
         addTeam.send(Protocol1_21_9To1_21_7.class);
     }
 
-    private void sendPlayerInfoProfileUpdate(final UserConnection connection, final UUID uuid, @Nullable final String name, final GameProfile.Property[] properties, int entityId) {
+    private void sendPlayerInfoProfileUpdate(final UserConnection connection, final UUID uuid, @Nullable final String name, final GameProfile.Property[] properties, int entityId, MannequinData mannequinData) {
         PacketWrapper destroy = PacketWrapper.create(ClientboundPackets1_21_6.REMOVE_ENTITIES, connection);
         destroy.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
         destroy.send(Protocol1_21_9To1_21_7.class);
@@ -208,6 +208,20 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
         playerInfo.write(Types.STRING, name != null ? name : randomHackyEmptyName());
         playerInfo.write(Types.PROFILE_PROPERTY_ARRAY, properties);
         playerInfo.send(Protocol1_21_9To1_21_7.class);
+
+        PacketWrapper add = PacketWrapper.create(ClientboundPackets1_21_6.ADD_ENTITY, connection);
+        add.write(Types.VAR_INT, entityId);
+        add.write(Types.UUID, uuid);
+        add.write(Types.VAR_INT, 151);
+        add.write(Types.DOUBLE, mannequinData.x());
+        add.write(Types.DOUBLE, mannequinData.y());
+        add.write(Types.DOUBLE, mannequinData.z());
+        writeMovementShorts(add, Vector3d.ZERO);
+        add.write(Types.BYTE, (byte) 0);
+        add.write(Types.BYTE, (byte) 0);
+        add.write(Types.BYTE, (byte) 0);
+        add.write(Types.VAR_INT, 0);
+        add.send(Protocol1_21_9To1_21_7.class);
     }
 
     private String randomHackyEmptyName() {
@@ -298,14 +312,15 @@ public final class EntityPacketRewriter1_21_9 extends EntityRewriter<Clientbound
             } else if (event.index() == 17) { // Profile
                 final ResolvableProfile profile = data.value();
                 final UUID uuid = event.trackedEntity().data().get(MannequinData.class).uuid();
-                sendPlayerInfoProfileUpdate(event.user(), uuid, profile.profile().name(), profile.profile().properties(), event.entityId());
+                final MannequinData mannequinData = event.trackedEntity().data().get(MannequinData.class);
+                sendPlayerInfoProfileUpdate(event.user(), uuid, profile.profile().name(), profile.profile().properties(), event.entityId(), mannequinData);
                 event.cancel();
             } else if (event.index() == 15) {
                 event.setIndex(18);
             } else if (event.index() == 16) {
                 event.setIndex(17);
             } else if (event.index() == 18) {
-                // TODO Immovable?
+                // TODO Immovable?w
                 event.cancel();
             } else if (event.index() == 19) {
                 event.cancel(); // Description
